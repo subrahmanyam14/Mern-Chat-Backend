@@ -23,7 +23,7 @@ const sendMessage = async (req, res) => {
 		const receiverSocketId = getReceiverSocketId(recieverId);
 		if (receiverSocketId) {
 			// io.to(<socket_id>).emit() used to send events to specific client
-			io.to(receiverSocketId).emit("newMessage", newMessage);
+			io.to(receiverSocketId).emit("newMessage", {newMessage: newMessage, conversationId: conversation._id});
 		}
 
         res.status(201).send(newMessage);
