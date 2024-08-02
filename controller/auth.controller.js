@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const UserModel = require("../models/user.model.js");
 const jwt = require("jsonwebtoken");
+const { getReceiverSocketId, io } = require("../socket/socket.js");
 
 const signUp = async (req, res) => {
     try {
@@ -30,6 +31,7 @@ const signUp = async (req, res) => {
         if (newUser) {
             await newUser.save();
             const token = jwt.sign({userId: newUser._id}, process.env.SECRET_KEY, {expiresIn: "15d"});
+            io.emit("newUser", newUser);
             res.status(201).send({
                 _id: newUser._id,
                 fullName: newUser.fullName,
@@ -56,7 +58,6 @@ const login = async (req, res) => {
             res.status(400).send({ error: "Invalid UserName or password..." });
         }
         const token = jwt.sign({userId: user._id}, process.env.SECRET_KEY, {expiresIn: "15d"});
-
         res.status(200).send({
             _id: user._id,
             fullName: user.fullName,
